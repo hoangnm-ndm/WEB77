@@ -1,18 +1,14 @@
 import http from "http";
+import { datas } from "./data.js";
+console.log(datas);
 
 const PORT = 8000;
-const myStudents = ["Thanh", "Chau", "Thao"];
 const app = http.createServer((request, response) => {
   /**
    * Tuyến đường chính http://localhost:8000/ -> /
    * Tuyến đường nhỏ đi ra từ tuyến chính -> /danh-cho-nam
    */
 
-  const products = [
-    { id: 1, name: "iphone 15", price: 2000 },
-    { id: 2, name: "iphone X", price: 2000 },
-    { id: 3, name: "iphone 9", price: 2000 },
-  ];
   const endpoint = request.url;
   switch (endpoint) {
     // với base endpoint (base API), mặc định base endpoint sẽ là /
@@ -25,7 +21,7 @@ const app = http.createServer((request, response) => {
       break;
 
     case "/products":
-      response.end(JSON.stringify(products));
+      response.end(JSON.stringify(datas));
       break;
     default:
       response.end(`Error, Notfound API!`);
