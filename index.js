@@ -4,12 +4,21 @@ import { users, posts } from "./data_lesson_2.js";
 import { v4 as uuidv4 } from "uuid";
 const app = express();
 
+import axios from "axios";
+const instance = axios.create({
+  baseURL: "http://localhost:3000",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 const PORT = 8000;
 
 app.use(express.json()); // Middleware
 
-app.get("/", (req, res) => {
-  res.send("Hello World");
+app.get("/", async (req, res) => {
+  const { data } = await instance.get("/products");
+  console.log(data);
+  res.send(data);
 });
 app.get("/san-pham", (req, res) => {
   console.log(req.query);
