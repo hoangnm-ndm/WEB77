@@ -1,6 +1,9 @@
 import express from "express";
 import { datas } from "./data.js";
+import { users, posts } from "./data_lesson_2.js";
+import { v4 as uuidv4 } from "uuid";
 const app = express();
+
 const PORT = 8000;
 
 app.use(express.json()); // Middleware
@@ -35,17 +38,23 @@ app.get("/san-pham/:id", (req, res) => {
 // ! Callback là hàm được truyền vào một hàm khác như một tham số
 
 app.post("/signup", (req, res) => {
-  const user = req.body;
-  if (user.password.length < 6) {
-    res.status(400).send("Mật khẩu phải có ít nhất 6 ký tự");
+  const { email, password } = req.body;
+  if (!email || !password) {
+    res.status(400).send("Email hoặc password không được để trống");
     return;
   }
-  if (user.usename === "hoangnm") {
-    res.status(400).send("Tên đăng nhập đã tồn tại");
+  if (users.find((item) => item.email === email)) {
+    res.status(400).send("Email đã tồn tại");
     return;
   }
-  //! Sau khi validation data, tạo user mới và lưu vào database
-  res.send("Đăng ký thành công");
+  const newUser = {
+    id: uuidv4(),
+    email,
+    password,
+  };
+  users.push(newUser);
+  console.log(users);
+  res.send(`Đăng ký thành công, ${newUser.email}`);
 });
 
 app.post("/login", (req, res) => {
