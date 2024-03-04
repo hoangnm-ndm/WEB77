@@ -57,7 +57,7 @@ app.put("/reset-password", (req, res) => {
 });
 
 app.delete("/delete-account", (req, res) => {
-  res.send("Xóa tài khoản thành công");
+  res.status(200).send("Xóa tài khoản thành công");
 });
 
 // ! GET PATCH PUT POST DELETE
