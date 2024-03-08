@@ -1,7 +1,4 @@
 import express from "express";
-import { datas } from "./data.js";
-import { users, posts } from "./data_lesson_2.js";
-import { v4 as uuidv4 } from "uuid";
 const app = express();
 
 import axios from "axios";
@@ -15,70 +12,134 @@ const PORT = 8000;
 
 app.use(express.json()); // Middleware
 
-app.get("/", async (req, res) => {
-  const { data } = await instance.get("/products");
-  console.log(data);
-  res.send(data);
-});
-app.get("/san-pham", (req, res) => {
-  console.log(req.query);
-  const brand = req.query.brand;
-  if (brand) {
-    const filterData = datas.filter((item) => item.brand === brand);
-    res.send(filterData);
-  }
-  res.send(datas);
-});
-
-app.get("/san-pham/:id", (req, res) => {
-  // :id là 1 param trong object req.params
-  const id = req.params.id;
-  if (id) {
-    const product = datas.find((item) => item.id === +id);
-    if (!product) {
-      res.status(404).send("Không tìm thấy sản phẩm");
-      return;
+app.get("/san-pham", async (req, res) => {
+  try {
+    const { data } = await instance.get("/products");
+    if (!data | (data.length === 0)) {
+      return res.status(404).json({
+        message: "Không có sản phẩm nào",
+      });
     }
-    res.send(product);
+    return res.status(200).json({
+      message: "Lấy sản phẩm thành công",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
   }
 });
 
-// ! Path bao gồm 2 thành phần chính (1 là cố định, 2 là biến)
-// ! Callback là hàm được truyền vào một hàm khác như một tham số
-
-app.post("/signup", (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    res.status(400).send("Email hoặc password không được để trống");
-    return;
+app.get("/san-pham/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { data } = await instance.get(`/products/${id}`);
+    if (!data) {
+      return res.status(404).json({
+        message: "Không tìm thấy sản phẩm",
+      });
+    }
+    return res.status(200).json({
+      message: "Lấy sản phẩm thành công",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
   }
-  if (users.find((item) => item.email === email)) {
-    res.status(400).send("Email đã tồn tại");
-    return;
+});
+
+app.post("/san-pham", async (req, res) => {
+  try {
+    const body = req.body;
+    // Validation body
+    if (!body.title || !body.price || !body.category) {
+      return res.status(400).json({
+        message: "Thiếu thông tin",
+      });
+    }
+    const { data } = await instance.post(`/products`, body);
+    if (!data) {
+      return res.status(404).json({
+        message: "Thêm sản phẩm không thành công!",
+      });
+    }
+    return res.status(200).json({
+      message: "Thêm sản phẩm thành công!",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
   }
-  const newUser = {
-    id: uuidv4(),
-    email,
-    password,
-  };
-  users.push(newUser);
-  console.log(users);
-  res.send(`Đăng ký thành công, ${newUser.email}`);
 });
 
-app.post("/login", (req, res) => {
-  res.send("Đăng nhập thành công");
+app.patch("/san-pham/:id", async (req, res) => {
+  try {
+    const body = req.body;
+    const id = req.params.id;
+    // Validation body
+    const { data } = await instance.patch(`/products/${id}`, body);
+    if (!data) {
+      return res.status(404).json({
+        message: "Cập nhật sản phẩm không thành công!",
+      });
+    }
+    return res.status(200).json({
+      message: "Cập nhật sản phẩm thành công!",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
 });
 
-app.put("/reset-password", (req, res) => {
-  res.send("Reset password thành công");
+app.put("/san-pham/:id", async (req, res) => {
+  try {
+    const body = req.body;
+    const id = req.params.id;
+    // Validation body
+    const { data } = await instance.put(`/products/${id}`, body);
+    if (!data) {
+      return res.status(404).json({
+        message: "Cập nhật sản phẩm không thành công!",
+      });
+    }
+    return res.status(200).json({
+      message: "Cập nhật sản phẩm thành công!",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
 });
 
-app.delete("/delete-account", (req, res) => {
-  res.status(200).send("Xóa tài khoản thành công");
+app.delete("/san-pham/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    await instance.delete(`/products/${id}`);
+    return res.status(200).json({
+      message: "Xoá sản phẩm thành công!",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      name: error.name,
+      message: error.message,
+    });
+  }
 });
-
-// ! GET PATCH PUT POST DELETE
 
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);
