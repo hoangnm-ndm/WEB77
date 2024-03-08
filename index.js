@@ -8,6 +8,22 @@ app.use(express.json()); // Middleware
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
+
+app.get("/users", async (req, res) => {
+  try {
+    const response = await fetch("http://localhost:3000/users");
+    const data = await response.json();
+    if (data.length === 0) {
+      throw new Error("Không có dữ liệu");
+    }
+    res.send(data);
+  } catch (error) {
+    res.end({
+      name: error?.name,
+      message: error?.message,
+    });
+  }
+});
 app.get("/san-pham", (req, res) => {
   console.log(req.query);
   const brand = req.query.brand;
@@ -63,5 +79,5 @@ app.delete("/delete-account", (req, res) => {
 // ! GET PATCH PUT POST DELETE
 
 app.listen(PORT, () => {
-  console.log(`Server is running on PORT ${PORT}`);
+  console.log(`Server is running http://localhost:${PORT}`);
 });
