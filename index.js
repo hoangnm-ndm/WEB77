@@ -1,13 +1,17 @@
 import express from "express";
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 import router from "./routes/index.js";
+
+dotenv.config();
 const app = express();
-const PORT = 8000;
+
+const { PORT, DB_URI } = process.env;
 
 app.use(express.json()); // Middleware
 
 // ? Phương thức connect với tham số connect string
-await mongoose.connect("mongodb://localhost:27017/mindx-fullstack").then(() => {
+await mongoose.connect(DB_URI).then(() => {
   console.log("connect to database successfully");
 });
 
