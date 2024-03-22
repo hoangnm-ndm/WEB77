@@ -2,13 +2,16 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import router from "./routes/index.js";
+import cors from "cors";
 
 dotenv.config();
 const app = express();
 
 const { PORT, DB_URI } = process.env;
 
-app.use(express.json()); // Middleware
+// Middleware
+app.use(cors());
+app.use(express.json());
 
 // ? Phương thức connect với tham số connect string
 await mongoose.connect(DB_URI).then(() => {
