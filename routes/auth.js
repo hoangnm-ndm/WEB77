@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { register } from "../controllers/auth.js";
-import { validateRegister } from "../middlewares/validateRegister.js";
+import { login, register } from "../controllers/auth.js";
+import { validateLogin, validateRegister } from "../middlewares/validAuth.js";
 
 const authRouter = Router();
 
 authRouter.post("/register", validateRegister, register);
-// authRouter.post("/login");
+authRouter.post("/login", validateLogin, login);
 
 export default authRouter;
