@@ -1,11 +1,8 @@
-import bcryptjs from "bcryptjs";
 import User from "../models/User.js";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const { TOKEN_SECRET } = process.env;
+import { token } from "../utils/jwt.js";
+import { comparePassword, hashPassword } from "../utils/password.js";
+import { validBody } from "../utils/validBody.js";
+import { loginSchema, registerSchema } from "../validations/auth.js";
 
 export const register = async (req, res, next) => {
   try {
@@ -17,6 +14,8 @@ export const register = async (req, res, next) => {
      */
     const { email, password } = req.body;
 
+    validBody(req.body, registerSchema);
+
     // 2. Check if email is already in use
     const userExist = await User.findOne({ email });
     if (userExist) {
@@ -26,15 +25,14 @@ export const register = async (req, res, next) => {
     }
 
     // 3. Hash password
-    const salt = bcryptjs.genSaltSync(10);
-    const hashPassword = await bcryptjs.hash(password, salt);
+    const hashPasswordUser = await hashPassword(password);
 
     // 4. Create user - save to database
 
     // Cach 1:
     const user = await User.create({
       email,
-      password: hashPassword,
+      password: hashPasswordUser,
     });
 
     // Cach 2:
@@ -61,6 +59,8 @@ export const login = async (req, res, next) => {
      * 5. Response token, user info
      */
     const { email, password } = req.body;
+    validBody(req.body, loginSchema);
+
     // 2. Check user exists
     const userExist = await User.findOne({ email });
     if (!userExist) {
@@ -70,23 +70,16 @@ export const login = async (req, res, next) => {
     }
 
     // 3. Compare password
-    const validPassword = await bcryptjs.compare(password, userExist.password);
-    if (!validPassword) {
-      return res.status(400).json({
-        message: "Password is incorrect",
-      });
-    }
+    comparePassword(password, userExist.password);
 
     // 4. Generate token
-    const token = jwt.sign({ _id: userExist._id }, TOKEN_SECRET, {
-      expiresIn: "1h",
-    });
+    const accessToken = token({ _id: userExist._id }, "1h");
 
     // 5. Response token, user info
     userExist.password = undefined;
     return res.status(200).json({
       message: "Login successfully!",
-      token,
+      accessToken,
       user: userExist,
     });
   } catch (error) {

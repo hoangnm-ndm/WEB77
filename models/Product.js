@@ -14,6 +14,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    cagory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
     hide: {
       type: Boolean,
       default: false,

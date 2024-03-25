@@ -1,15 +1,12 @@
 import Product from "../models/Product.js";
+import { validBody } from "../utils/validBody.js";
+import { productSchema } from "../validations/product.js";
 
 export const createProduct = async (req, res, next) => {
   try {
-    const { name, price, description } = req.body;
     // Validation
-    if (!name || !price || !description) {
-      return res.status(400).json({
-        message: "Invalid input",
-      });
-    }
-    const data = await Product.create({ name, price, description });
+    validBody(req.body, productSchema);
+    const data = await Product.create(req.body);
     if (data) {
       return res.status(201).json({
         message: "Create product successfully",
@@ -103,6 +100,7 @@ export const softRemoveProductById = async (req, res, next) => {
 
 export const updateProduct = async (req, res, next) => {
   try {
+    validBody(req.body, productSchema);
     const data = await Product.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });

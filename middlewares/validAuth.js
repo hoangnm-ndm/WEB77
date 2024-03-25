@@ -1,4 +1,3 @@
-import { login } from "../controllers/auth.js";
 import { loginSchema, registerSchema } from "../validations/auth.js";
 
 export const validateRegister = (req, res, next) => {
