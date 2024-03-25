@@ -15,10 +15,23 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "member",
     },
-    profile: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Profile",
+    fullName: {
+      type: String,
+      required: true,
     },
+    dob: {
+      type: Date,
+    },
+    placeOfBirth: {
+      type: String,
+    },
+    nationality: {
+      type: String,
+    },
+    hobbies: {
+      type: [String],
+    },
+    education: {},
   },
   {
     timestamps: true,
