@@ -2,7 +2,8 @@ import Profile from "../models/Profile.js";
 
 const checkProfileOwnership = async (req, res, next) => {
   try {
-    const userId = req.body.userId;
+    // user này vefify từ token ra rồi
+    const userId = req.user._id;
     const profileId = req.params.id;
     const profile = await Profile.findById(profileId);
 

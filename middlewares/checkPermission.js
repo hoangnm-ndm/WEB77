@@ -44,6 +44,7 @@ export const checkPermission = async (req, res, next) => {
     }
 
     // B4: Nếu có thì next(), không thì trả về lỗi 403
+    req.user = user;
     next();
   } catch (error) {
     next(error);
